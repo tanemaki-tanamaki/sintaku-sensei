@@ -10,5 +10,27 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // iframe内でのみ有効
+      if (window.top !== window.self) {
+        document.addEventListener('click', function(e){
+          const a = e.target.closest('a[href]');
+          if (!a) return;
+
+          const to = new URL(a.getAttribute('href'), location.href);
+
+          // 内部判定：同一オリジン かつ 指定ベースパス配下（例：/estimate/）
+          const isInternal =
+            to.origin === location.origin &&
+            to.pathname.startsWith('/estimate/');
+
+          // 外部のみ 親で開く（内部＝フォーム内遷移はそのまま）
+          if (!isInternal) {
+            e.preventDefault();
+            window.top.location.href = to.href;
+          }
+        }, true);
+      }
+    </script>
   </body>
 </html>
